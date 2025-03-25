@@ -336,7 +336,9 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>x', group = 'Trouble Tool Debug' },
+        -- { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>h', group = 'Harpoon', mode = { 'n' } },
       },
     },
   },
@@ -481,7 +483,7 @@ require('lazy').setup({
       { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
-      'hrsh7th/cmp-nvim-lsp',
+      { 'hrsh7th/cmp-nvim-lsp', disable = true },
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -553,7 +555,7 @@ require('lazy').setup({
 
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
-          map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+          map('<leader>cr', vim.lsp.buf.rename, '[C]ode [r]ename')
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
@@ -990,7 +992,7 @@ require('lazy').setup({
   require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.neo-tree',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
@@ -1124,3 +1126,119 @@ hi Normal ctermbg=NONE
 hi NonText ctermbg=NONE
 hi Normal guibg=NONE
 ]]
+
+require('virt-column').setup {
+  char = '‖',
+  virtcolumn = '80',
+}
+
+-- display diagnostics auto on hover
+-- vim.o.updatetime = 250 -- Set update time for responsiveness
+--
+-- vim.api.nvim_create_autocmd('CursorHold', {
+--   callback = function()
+--     vim.diagnostic.open_float(nil, { focus = false, position = 'above' })
+--   end,
+-- })
+
+-- display diagnostics when press K
+vim.api.nvim_set_keymap('n', '<leader>cd', '<cmd>lua vim.diagnostic.open_float()<CR>', { noremap = true, silent = true })
+-- Close diagnostic floating windows with a keystroke regardless of cursor position
+vim.keymap.set('n', '<Esc>', function()
+  -- Get all floating windows
+  local wins = vim.api.nvim_list_wins()
+  for _, win in ipairs(wins) do
+    local config = vim.api.nvim_win_get_config(win)
+    -- Check if the window is floating
+    if config.relative ~= '' then
+      vim.api.nvim_win_close(win, false)
+    end
+  end
+end, { desc = 'Close diagnostic floating windows' })
+--
+--
+require('stay-centered').setup {
+  -- The filetype is determined by the vim filetype, not the file extension. In order to get the filetype, open a file and run the command:
+  -- :lua print(vim.bo.filetype)
+  skip_filetypes = {},
+  -- Set to false to disable by default
+  enabled = true,
+  -- allows scrolling to move the cursor without centering, default recommended
+  allow_scroll_move = true,
+  -- temporarily disables plugin on left-mouse down, allows natural mouse selection
+  -- try disabling if plugin causes lag, function uses vim.on_key
+  disable_on_mouse = true,
+}
+
+require('colorizer').setup()
+
+local harpoon = require 'harpoon'
+
+-- REQUIRED
+harpoon:setup()
+-- REQUIRED
+
+vim.keymap.set('n', '<leader>ha', function()
+  harpoon:list():add()
+end, { desc = 'Add buffer to harpoon' })
+vim.keymap.set('n', '<leader>hm', function()
+  harpoon.ui:toggle_quick_menu(harpoon:list())
+end, { desc = 'Display harpoon list' })
+
+-- vim.keymap.set('n', '<C-1>', function()
+--   harpoon:list():select(1)
+-- end, { desc = 'Go harpoon 1' })
+-- vim.keymap.set('n', '<C-2>', function()
+--   harpoon:list():select(2)
+-- end, { desc = 'Go harpoon 2' })
+-- vim.keymap.set('n', '<C-3>', function()
+--   harpoon:list():select(3)
+-- end, { desc = 'Go harpoon 3' })
+-- vim.keymap.set('n', '<C-4>', function()
+--   harpoon:list():select(4)
+-- end, { desc = 'Go harpoon 4' })
+-- vim.keymap.set('n', '<C-5>', function()
+--   harpoon:list():select(5)
+-- end, { desc = 'Go harpoon 5' })
+--
+vim.keymap.set('n', '<leader>1', function()
+  harpoon:list():select(1)
+end, { desc = 'Go harpoon 1' })
+vim.keymap.set('n', '<leader>2', function()
+  harpoon:list():select(2)
+end, { desc = 'Go harpoon 2' })
+vim.keymap.set('n', '<leader>3', function()
+  harpoon:list():select(3)
+end, { desc = 'Go harpoon 3' })
+vim.keymap.set('n', '<leader>4', function()
+  harpoon:list():select(4)
+end, { desc = 'Go harpoon 4' })
+vim.keymap.set('n', '<leader>5', function()
+  harpoon:list():select(5)
+end, { desc = 'Go harpoon 5' })
+
+-- Toggle previous & next buffers stored within Harpoon list
+vim.keymap.set('n', '<leader>hp', function()
+  harpoon:list():prev()
+end, { desc = 'Go previous harpoon list' })
+vim.keymap.set('n', '<leader>hn', function()
+  harpoon:list():next()
+end, { desc = 'Go next harpoon list' })
+
+-- local exlorer_config = require("snacks.picker.explorer.Config")
+-- config.layout =
+--
+--
+
+-- vim.cmd [[
+--   fun! Find(char, backward)
+--     let c = nr2char(char2nr(a:char))
+--     let c_upper = nr2char(char2nr(toupper(a:char)))
+--     let c_lower = nr2char(char2nr(tolower(a:char)))
+--     let pattern = printf('[%s%s]', c_upper, c_lower)
+--     call search(pattern, a:backward ? 'b' : '')
+--   endfun
+--
+--   nnoremap <silent> f :call Find(nr2char(getchar()), 0)<CR>
+--   nnoremap <silent> F :call Find(nr2char(getchar()), 1)<CR>
+-- ]]

@@ -34,7 +34,19 @@ return {
       enabled = true,
       timeout = 3000,
     },
-    picker = { enabled = true },
+    -- picker = { enabled = true },
+    picker = {
+      enabled = true,
+      sources = {
+        explorer = {
+          layout = {
+            layout = {
+              position = 'right',
+            },
+          },
+        },
+      },
+    },
     quickfile = { enabled = true },
     scope = { enabled = true },
     scroll = { enabled = false },
@@ -299,13 +311,6 @@ return {
         Snacks.notifier.show_history()
       end,
       desc = 'Notification History',
-    },
-    {
-      '<leader>bd',
-      function()
-        Snacks.bufdelete()
-      end,
-      desc = 'Delete Buffer',
     },
     {
       '<leader>cR',
